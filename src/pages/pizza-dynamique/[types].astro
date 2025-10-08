@@ -26,7 +26,6 @@ const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryDat
       ← Retour à la liste
     </a>
 
-    <!-- En-tête -->
     <div class="mb-8">
       <h1 class="text-4xl font-bold mb-2 text-gray-900">{types}</h1>
       <p class="text-xl text-gray-600">
@@ -34,7 +33,6 @@ const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryDat
       </p>
     </div>
 
-    <!-- Statistiques -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       <div class="bg-orange-50 rounded-lg p-4 border-2 border-orange-200">
         <h3 class="text-sm font-semibold text-gray-600 mb-1">Total commandes</h3>
@@ -53,8 +51,6 @@ const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryDat
         </p>
       </div>
     </div>
-
-    <!-- Graphique Principal -->
     <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-orange-100 mb-8">
       <h2 class="text-2xl font-bold mb-4 text-gray-800">
         Prix vs Nombre de commandes
@@ -83,7 +79,6 @@ const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryDat
       />
     </div>
 
-    <!-- Graphique Revenus dans le temps -->
     <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-orange-100 mb-8">
       <h2 class="text-2xl font-bold mb-4 text-gray-800">
         Revenus par commande
@@ -116,7 +111,6 @@ const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryDat
       )}
     </div>
 
-    <!-- Pizzas populaires -->
     <div class="mt-8 bg-gray-50 rounded-lg p-6 border-2 border-gray-200">
       <h2 class="text-2xl font-bold mb-4 text-gray-800">Pizzas les plus populaires</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -135,29 +129,4 @@ const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryDat
         })}
       </div>
     </div>
-
-    <!-- Détails techniques -->
-    <div class="mt-8 p-6 bg-gray-100 rounded-lg">
-      <h3 class="text-lg font-semibold text-gray-800 mb-3">
-        💡 Détails techniques de cette page
-      </h3>
-      <ul class="space-y-2 text-sm text-gray-700">
-        <li>
-          <strong>Route :</strong> <code class="bg-white px-2 py-1 rounded">/pizza-dynamique/{types}</code>
-        </li>
-        <li>
-          <strong>Génération :</strong> À chaque requête (SSR - Server-Side Rendering)
-        </li>
-        <li>
-          <strong>Méthode :</strong> <code class="bg-white px-2 py-1 rounded">prerender = false</code> avec <code class="bg-white px-2 py-1 rounded">Astro.params</code>
-        </li>
-        <li>
-          <strong>Données filtrées :</strong> {categoryData.length} commandes de la catégorie {types}
-        </li>
-        <li>
-          <strong>Type de rendu :</strong> SSR (Server-Side Rendering) - Généré dynamiquement
-        </li>
-      </ul>
-    </div>
-  </div>
 </Layout>
