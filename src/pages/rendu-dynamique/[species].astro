@@ -1,0 +1,112 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlotFigure from "../../components/PlotFigure.astro";
+import * as Plot from "@observablehq/plot";
+import penguins from "../../assets/penguins.json";
+const { species } = Astro.params;
+const speciesData = penguins.filter((p) => p.species === species);
+
+export function getStaticPaths() {
+    const species = [...new Set(penguins.map((p) => p.species))].sort();
+
+    return species.map((s) => ({
+        params: { species: s },
+    }));
+}
+---
+
+<Layout>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <a
+            href="/rendu-dynamique"
+            class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6 font-semibold"
+        >
+            ← Retour à la liste
+        </a>
+
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2 text-gray-900">{species}</h1>
+            <p class="text-xl text-gray-600">
+                Analyse de {speciesData.length} spécimens
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-blue-50 rounded-lg p-4">
+                <h3 class="text-sm font-semibold text-gray-600 mb-1">
+                    Spécimens
+                </h3>
+                <p class="text-3xl font-bold text-blue-600">
+                    {speciesData.length}
+                </p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4">
+                <h3 class="text-sm font-semibold text-gray-600 mb-1">
+                    Îles observées
+                </h3>
+                <p class="text-3xl font-bold text-green-600">
+                    {[...new Set(speciesData.map((p) => p.island))].length}
+                </p>
+            </div>
+            <div class="bg-purple-50 rounded-lg p-4">
+                <h3 class="text-sm font-semibold text-gray-600 mb-1">
+                    Masse moyenne (g)
+                </h3>
+                <p class="text-3xl font-bold text-purple-600">
+                    {
+                        Math.round(
+                            speciesData.reduce(
+                                (sum, p) => sum + (p.body_mass_g || 0),
+                                0,
+                            ) / speciesData.filter((p) => p.body_mass_g).length,
+                        )
+                    }
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                Longueur vs Profondeur du bec
+            </h2>
+            <PlotFigure
+                options={{
+                    marks: [
+                        Plot.dot(speciesData, {
+                            x: "culmen_length_mm",
+                            y: "culmen_depth_mm",
+                            fill: "species",
+                            r: 6,
+                            opacity: 0.7,
+                        }),
+                    ],
+                    marginLeft: 60,
+                    marginBottom: 40,
+                    grid: true,
+                    x: {
+                        label: "Longueur du bec (mm)",
+                    },
+                    y: {
+                        label: "Profondeur du bec (mm)",
+                    },
+                }}
+            />
+        </div>
+        <div class="mt-8 bg-gray-50 rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                Îles d'observation
+            </h2>
+            <div class="flex gap-3">
+                {
+                    [...new Set(speciesData.map((p) => p.island))].map(
+                        (island) => (
+                            <span class="bg-white px-4 py-2 rounded-full border-2 border-gray-200 font-semibold">
+                                {island}
+                            </span>
+                        ),
+                    )
+                }
+            </div>
+        </div>
+    </div>
+</Layout>

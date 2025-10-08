@@ -1,0 +1,158 @@
+---
+import penguins from "../assets/penguins.json";
+
+// Générer automatiquement la liste des espèces pour le sous-menu
+const species = [...new Set(penguins.map((p) => p.species))].sort();
+
+// Récupérer l'URL actuelle pour mettre en surbrillance le lien actif
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo / Titre -->
+      <a href="/" class="flex items-center space-x-2 text-white font-bold text-xl hover:text-blue-200 transition-colors">
+        <span class="text-2xl">🐧</span>
+        <span>Penguins Analysis</span>
+      </a>
+
+      <!-- Menu principal -->
+      <div class="hidden md:flex items-center space-x-1">
+        <a
+          href="/"
+          class={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+            currentPath === "/" 
+              ? "bg-white text-blue-600 shadow-md" 
+              : "text-white hover:bg-white/20"
+          }`}
+        >
+          Accueil
+        </a>
+
+        <a
+          href="/penguins"
+          class={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+            currentPath === "/penguins" 
+              ? "bg-white text-blue-600 shadow-md" 
+              : "text-white hover:bg-white/20"
+          }`}
+        >
+          Onglets
+        </a>
+
+        <!-- Menu déroulant Rendu Dynamique -->
+        <div class="relative dropdown-menu">
+          <button
+            id="dropdown-button"
+            type="button"
+            class={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center cursor-pointer ${
+              currentPath.startsWith("/rendu-dynamique") 
+                ? "bg-white text-blue-600 shadow-md" 
+                : "text-white hover:bg-white/20"
+            }`}
+          >
+            Rendu Dynamique
+            <svg id="dropdown-arrow" class="w-4 h-4 ml-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Sous-menu -->
+          <div id="dropdown-content" class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl">
+            <a
+              href="/rendu-dynamique"
+              class="block px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-t-lg font-semibold border-b border-gray-100"
+            >
+              📋 Liste des espèces
+            </a>
+            <div class="py-2">
+              {species.map((s) => (
+                <a
+                  href={`/rendu-dynamique/${s}`}
+                  class={`block px-4 py-2 text-gray-700 hover:bg-blue-50 transition-colors ${
+                    currentPath === `/rendu-dynamique/${s}` ? "bg-blue-100 font-semibold" : ""
+                  }`}
+                >
+                  🐧 {s}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu mobile (hamburger) -->
+      <button
+        id="mobile-menu-button"
+        class="md:hidden text-white p-2 rounded-lg hover:bg-white/20 transition-colors"
+        aria-label="Menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Menu mobile dépliant -->
+  <div id="mobile-menu" class="hidden md:hidden bg-blue-700">
+    <div class="px-4 py-3 space-y-2">
+      <a href="/" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
+        Accueil
+      </a>
+      <a href="/penguins" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
+        Onglets
+      </a>
+      <div class="border-t border-blue-500 pt-2 mt-2">
+        <p class="px-4 py-2 text-white font-semibold text-sm">Rendu Dynamique</p>
+        <a href="/rendu-dynamique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg text-sm">
+          📋 Liste des espèces
+        </a>
+        {species.map((s) => (
+          <a href={`/rendu-dynamique/${s}`} class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg text-sm">
+            🐧 {s}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Toggle menu mobile
+  document.addEventListener('DOMContentLoaded', () => {
+    const mobileButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileButton?.addEventListener('click', () => {
+      mobileMenu?.classList.toggle('hidden');
+    });
+
+    // Menu déroulant desktop avec CLICK
+    const dropdownButton = document.getElementById('dropdown-button');
+    const dropdownContent = document.getElementById('dropdown-content');
+    const dropdownArrow = document.getElementById('dropdown-arrow');
+    
+    // Toggle au click
+    dropdownButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownContent?.classList.toggle('hidden');
+      dropdownArrow?.classList.toggle('rotate-180');
+    });
+
+    // Fermer le menu si on clique ailleurs
+    document.addEventListener('click', (e) => {
+      if (!dropdownButton?.contains(e.target as Node) && !dropdownContent?.contains(e.target as Node)) {
+        dropdownContent?.classList.add('hidden');
+        dropdownArrow?.classList.remove('rotate-180');
+      }
+    });
+  });
+</script>
+
+<style>
+  #dropdown-arrow {
+    transition: transform 0.2s ease;
+  }
+</style>
