@@ -41,6 +41,17 @@ const currentPath = Astro.url.pathname;
           Onglets
         </a>
 
+        <a
+          href="/rendu-statique"
+          class={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+            currentPath.startsWith("/rendu-statique")
+              ? "bg-white text-blue-600 shadow-md" 
+              : "text-white hover:bg-white/20"
+          }`}
+        >
+          Rendu Statique
+        </a>
+
         <!-- Menu déroulant Rendu Dynamique -->
         <div class="relative dropdown-menu">
           <button
@@ -103,6 +114,9 @@ const currentPath = Astro.url.pathname;
       </a>
       <a href="/penguins" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
         Onglets
+      </a>
+      <a href="/rendu-statique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
+        Rendu Statique
       </a>
       <div class="border-t border-blue-500 pt-2 mt-2">
         <p class="px-4 py-2 text-white font-semibold text-sm">Rendu Dynamique</p>

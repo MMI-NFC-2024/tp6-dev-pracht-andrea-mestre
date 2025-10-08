@@ -1,0 +1,79 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import penguins from "../../assets/penguins.json";
+const species = [...new Set(penguins.map((p) => p.species))].sort();
+---
+
+<Layout>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+      <p class="text-green-800 font-semibold">
+        🚀 Version Statique  - Pages générées au build avec getStaticPaths()
+      </p>
+    </div>
+
+    <h1 class="text-4xl font-bold mb-4 text-gray-900">
+      Explorer les espèces de pingouins (Rendu Statique)
+    </h1>
+    <p class="text-lg text-gray-600 mb-8">
+      Cliquez sur une espèce pour voir ses statistiques et graphiques détaillés
+    </p>
+
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {species.map((s) => {
+        const speciesCount = penguins.filter((p) => p.species === s).length;
+        return (
+          <a
+            href={`/rendu-statique/${s}`}
+            class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 border-2 border-green-200 hover:border-green-400"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-2xl font-bold text-gray-800">{s}</h2>
+              <span class="text-4xl">🐧</span>
+            </div>
+            <p class="text-gray-600 mb-2">
+              <span class="font-semibold">{speciesCount}</span> spécimens
+            </p>
+            <div class="flex items-center text-green-600 font-semibold mt-4">
+              <span>Voir les détails</span>
+              <svg 
+                class="w-5 h-5 ml-2" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <div class="mt-12 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-8">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Statistiques globales</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <p class="text-sm text-gray-600 mb-1">Total de spécimens</p>
+          <p class="text-4xl font-bold text-green-600">{penguins.length}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600 mb-1">Espèces différentes</p>
+          <p class="text-4xl font-bold text-teal-600">{species.length}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-600 mb-1">Îles étudiées</p>
+          <p class="text-4xl font-bold text-emerald-600">
+            {[...new Set(penguins.map((p) => p.island))].length}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

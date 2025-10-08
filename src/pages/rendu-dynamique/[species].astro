@@ -3,20 +3,24 @@ import Layout from "../../layouts/Layout.astro";
 import PlotFigure from "../../components/PlotFigure.astro";
 import * as Plot from "@observablehq/plot";
 import penguins from "../../assets/penguins.json";
+
+// ✅ Activer le rendu dynamique (SSR)
+export const prerender = false;
+
+// Récupérer l'espèce depuis l'URL de façon dynamique
 const { species } = Astro.params;
 const speciesData = penguins.filter((p) => p.species === species);
-
-export function getStaticPaths() {
-    const species = [...new Set(penguins.map((p) => p.species))].sort();
-
-    return species.map((s) => ({
-        params: { species: s },
-    }));
-}
 ---
 
 <Layout>
     <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Badge SSR -->
+        <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <p class="text-blue-800 font-semibold">
+                ⚡ Rendu Dynamique (SSR) - Page générée à chaque requête avec prerender = false
+            </p>
+        </div>
+
         <a
             href="/rendu-dynamique"
             class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6 font-semibold"

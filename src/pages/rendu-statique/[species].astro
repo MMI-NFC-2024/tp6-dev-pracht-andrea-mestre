@@ -1,0 +1,113 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlotFigure from "../../components/PlotFigure.astro";
+import * as Plot from "@observablehq/plot";
+import penguins from "../../assets/penguins.json";
+
+// ✅ Générer les routes statiques pour chaque espèce avec getStaticPaths()
+export function getStaticPaths() {
+  const species = [...new Set(penguins.map((p) => p.species))].sort();
+  
+  return species.map((s) => ({
+    params: { species: s },
+  }));
+}
+
+// Récupérer l'espèce depuis l'URL via Astro.params
+const { species } = Astro.params;
+
+// Filtrer les données pour l'espèce demandée
+const speciesData = penguins.filter((p) => p.species === species);
+---
+
+<Layout>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+      <p class="text-green-800 font-semibold">
+        🚀 Page générée statiquement avec getStaticPaths() au moment du build
+      </p>
+    </div>
+
+    <!-- Navigation retour -->
+    <a 
+      href="/rendu-statique" 
+      class="inline-flex items-center text-green-600 hover:text-green-800 mb-6 font-semibold"
+    >
+      ← Retour à la liste
+    </a>
+
+    <!-- En-tête -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold mb-2 text-gray-900">{species}</h1>
+      <p class="text-xl text-gray-600">
+        Analyse de {speciesData.length} spécimens
+      </p>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Spécimens</h3>
+        <p class="text-3xl font-bold text-green-600">{speciesData.length}</p>
+      </div>
+      <div class="bg-teal-50 rounded-lg p-4 border-2 border-teal-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Îles observées</h3>
+        <p class="text-3xl font-bold text-teal-600">
+          {[...new Set(speciesData.map((p) => p.island))].length}
+        </p>
+      </div>
+      <div class="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Masse moyenne (g)</h3>
+        <p class="text-3xl font-bold text-emerald-600">
+          {Math.round(
+            speciesData.reduce((sum, p) => sum + (p.body_mass_g || 0), 0) / 
+            speciesData.filter((p) => p.body_mass_g).length
+          )}
+        </p>
+      </div>
+    </div>
+
+    <!-- Graphique -->
+    <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-green-100">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Longueur vs Profondeur du bec
+      </h2>
+      <PlotFigure
+        options={{
+          marks: [
+            Plot.dot(speciesData, {
+              x: "culmen_length_mm",
+              y: "culmen_depth_mm",
+              fill: "species",
+              r: 6,
+              opacity: 0.7,
+            }),
+          ],
+          marginLeft: 60,
+          marginBottom: 40,
+          grid: true,
+          x: {
+            label: "Longueur du bec (mm)",
+          },
+          y: {
+            label: "Profondeur du bec (mm)",
+          },
+        }}
+      />
+    </div>
+
+    <!-- Îles -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-6 border-2 border-gray-200">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Îles d'observation</h2>
+      <div class="flex gap-3">
+        {[...new Set(speciesData.map((p) => p.island))].map((island) => (
+          <span class="bg-white px-4 py-2 rounded-full border-2 border-green-200 font-semibold text-green-700">
+            {island}
+          </span>
+        ))}
+      </div>
+    </div>
+
+   
+  </div>
+</Layout>
