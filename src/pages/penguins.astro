@@ -1,0 +1,127 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PlotFigure from "../components/PlotFigure.astro";
+import * as Plot from "@observablehq/plot";
+import penguins from "../assets/penguins.json";
+const species = [...new Set(penguins.map((s) => s.species))].sort();
+---
+
+<Layout>
+    <h1 class="text-3xl font-bold mb-6">Pingouins par Espèce</h1>
+    <div class="mb-6">
+        <div class="flex gap-2 border-b-2 border-gray-200">
+            {species.map((s, index) => (
+                <button
+                    class={`px-6 py-3 font-semibold transition-all duration-200 ${
+                        index === 0 
+                            ? 'tab-button active bg-blue-500 text-white rounded-t-lg' 
+                            : 'tab-button bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-t-lg'
+                    }`}
+                    data-tab={s}
+                    aria-label={`Afficher les données de l'espèce ${s}`}
+                >
+                    {s}
+                </button>
+            ))}
+        </div>
+    </div>
+    
+    <div class="tab-content-container">
+        {species.map((s, index) => (
+            <div 
+                class={`tab-content ${index === 0 ? 'active' : 'hidden'}`}
+                data-content={s}
+            >
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-800">{s}</h2>
+                    <p class="text-gray-600 mb-4">
+                        Nombre de spécimens : {penguins.filter((p) => p.species === s).length}
+                    </p>
+                    <PlotFigure
+                        options={{
+                            marks: [
+                                Plot.dot(penguins.filter((p) => p.species === s), {
+                                    x: "culmen_length_mm",
+                                    y: "culmen_depth_mm",
+                                    fill: "species",
+                                    r: 5,
+                                }),
+                            ],
+                            marginLeft: 60,
+                            marginBottom: 40,
+                            grid: true,
+                        }}
+                    />
+                </div>
+            </div>
+        ))}
+    </div>
+</Layout>
+
+<script>
+    // Système d'onglets interactif
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+
+                // Désactiver tous les onglets
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active', 'bg-blue-500', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-700');
+                });
+
+                // Activer l'onglet cliqué
+                button.classList.add('active', 'bg-blue-500', 'text-white');
+                button.classList.remove('bg-gray-100', 'text-gray-700');
+
+                // Masquer tous les contenus
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    content.classList.add('hidden');
+                });
+
+                // Afficher le contenu correspondant
+                const targetContent = document.querySelector(`[data-content="${targetTab}"]`);
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .tab-button {
+        cursor: pointer;
+        border: none;
+        outline: none;
+    }
+    
+    .tab-button:hover {
+        transform: translateY(-2px);
+    }
+    
+    .tab-button.active {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tab-content {
+        animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
