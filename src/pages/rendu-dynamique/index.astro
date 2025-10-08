@@ -20,7 +20,7 @@ const species = [...new Set(penguins.map((p) => p.species))].sort();
     <p class="text-lg text-gray-600 mb-8">
       Cliquez sur une espèce pour voir ses statistiques et graphiques détaillés
     </p>
-    
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       {species.map((s) => {
         const speciesCount = penguins.filter((p) => p.species === s).length;
@@ -75,4 +75,5 @@ const species = [...new Set(penguins.map((p) => p.species))].sort();
         </div>
       </div>
     </div>
+  </div>
 </Layout>

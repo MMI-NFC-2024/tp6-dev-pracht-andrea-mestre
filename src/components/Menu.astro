@@ -49,6 +49,17 @@ const currentPath = Astro.url.pathname;
           Rendu Statique
         </a>
 
+        <a
+          href="/pizza-statique"
+          class={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+            currentPath.startsWith("/pizza-statique")
+              ? "bg-white text-blue-600 shadow-md" 
+              : "text-white hover:bg-white/20"
+          }`}
+        >
+          Pizza Statique
+        </a>
+
         <div class="relative dropdown-menu">
           <button
             id="dropdown-button-pizza"
@@ -150,6 +161,9 @@ const currentPath = Astro.url.pathname;
       </a>
       <a href="/rendu-statique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
         Rendu Statique
+      </a>
+      <a href="/pizza-statique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
+        Pizza Statique
       </a>
       
       <div class="border-t border-blue-500 pt-2 mt-2">

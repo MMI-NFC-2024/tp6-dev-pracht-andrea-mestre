@@ -1,42 +1,35 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import pizza from "../../assets/pizza.json";
-export const prerender = false;
 const categories = [...new Set(pizza.map((p) => p.category))].sort();
 ---
 
 <Layout>
-
     <h1 class="text-4xl font-bold mb-4 text-gray-900">
-      Explorer les catégories de pizzas (Rendu Dynamique)
+      Explorer les catégories de pizzas (Rendu Statique)
     </h1>
     <p class="text-lg text-gray-600 mb-8">
       Cliquez sur une catégorie pour voir ses statistiques et graphiques détaillés
     </p>
 
-  
+    
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       {categories.map((c) => {
-        const categoryCount = pizza.filter((p) => p.category === c).length;
-        const totalRevenue = pizza
-          .filter((p) => p.category === c)
-          .reduce((sum, p) => sum + p.revenue, 0);
+        const categoryData = pizza.filter((p) => p.category === c);
+        const orderCount = categoryData.length;
         return (
           <a
-            href={`/pizza-dynamique/${c}`}
-            class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 border-2 border-orange-200 hover:border-orange-400"
+            href={`/pizza-statique/${c}`}
+            class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 border-2 border-green-200 hover:border-green-400"
           >
             <div class="flex items-center justify-between mb-3">
               <h2 class="text-2xl font-bold text-gray-800">{c}</h2>
               <span class="text-4xl">🍕</span>
             </div>
             <p class="text-gray-600 mb-2">
-              <span class="font-semibold">{categoryCount}</span> commandes
+              <span class="font-semibold">{orderCount}</span> commandes
             </p>
-            <p class="text-gray-600 mb-2">
-              <span class="font-semibold">${Math.round(totalRevenue)}</span> revenus
-            </p>
-            <div class="flex items-center text-orange-600 font-semibold mt-4">
+            <div class="flex items-center text-green-600 font-semibold mt-4">
               <span>Voir les détails</span>
               <svg 
                 class="w-5 h-5 ml-2" 
@@ -57,24 +50,25 @@ const categories = [...new Set(pizza.map((p) => p.category))].sort();
       })}
     </div>
 
-  
-    <div class="mt-12 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-8">
+    <div class="mt-12 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-8">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Statistiques globales</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <p class="text-sm text-gray-600 mb-1">Total de commandes</p>
-          <p class="text-4xl font-bold text-orange-600">{pizza.length}</p>
+          <p class="text-4xl font-bold text-green-600">{pizza.length}</p>
         </div>
         <div>
           <p class="text-sm text-gray-600 mb-1">Catégories différentes</p>
-          <p class="text-4xl font-bold text-red-600">{categories.length}</p>
+          <p class="text-4xl font-bold text-teal-600">{categories.length}</p>
         </div>
         <div>
-          <p class="text-sm text-gray-600 mb-1">Revenus totaux</p>
-          <p class="text-4xl font-bold text-amber-600">
-            ${Math.round(pizza.reduce((sum, p) => sum + p.revenue, 0)).toLocaleString()}
+          <p class="text-sm text-gray-600 mb-1">Types uniques</p>
+          <p class="text-4xl font-bold text-emerald-600">
+            {[...new Set(pizza.map((p) => p.name))].length}
           </p>
         </div>
       </div>
     </div>
+  </div>
+</div>
 </Layout>
