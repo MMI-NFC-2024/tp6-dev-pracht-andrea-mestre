@@ -3,10 +3,13 @@ import PlotFigure from "../components/PlotFigure.astro";
 import Layout from "../layouts/Layout.astro";
 import * as Plot from "@observablehq/plot";
 import penguins from "../assets/penguins.json";
+import pizza from "../assets/pizza.json";
 ---
 
 <Layout>
-  <h1 class="text-2xl">Test Astro et Plot (Observablehq)</h1>
+  <h1 class="text-2xl"> Astro et Plot</h1>
+  
+  <h2 class="text-xl mt-6 mb-2">Pingouins - Dimensions du bec</h2>
   <PlotFigure
     options={{
       marks: [
@@ -14,8 +17,50 @@ import penguins from "../assets/penguins.json";
           x: "culmen_length_mm",
           y: "culmen_depth_mm",
           stroke: "species",
+          r: 4,
         }),
       ],
+      grid: true,
+      marginLeft: 70,
+      marginBottom: 50,
+      marginTop: 20,
+      x: {
+        label: "Longueur du bec (mm)",
+      },
+      y: {
+        label: "Profondeur du bec (mm)",
+      },
+      color: {
+        legend: true,
+      },
+    }}
+  />
+  
+  <h2 class="text-xl mt-8 mb-2">Pizzas - Prix vs Commandes</h2>
+  <PlotFigure
+    options={{
+      marks: [
+        Plot.dot(pizza, {
+          x: "price",
+          y: "orders",
+          stroke: "category",
+          r: 3,
+          opacity: 0.6,
+        }),
+      ],
+      grid: true,
+      marginLeft: 70,
+      marginBottom: 50,
+      marginTop: 20,
+      x: {
+        label: "Prix ($)",
+      },
+      y: {
+        label: "Nombre de commandes",
+      },
+      color: {
+        legend: true,
+      },
     }}
   />
 </Layout>

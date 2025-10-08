@@ -1,0 +1,163 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PlotFigure from "../../components/PlotFigure.astro";
+import * as Plot from "@observablehq/plot";
+import pizza from "../../assets/pizza.json";
+export const prerender = false;
+const { types } = Astro.params;
+const categoryData = pizza.filter((p) => p.category === types);
+const totalOrders = categoryData.reduce((sum, p) => sum + p.orders, 0);
+const totalRevenue = categoryData.reduce((sum, p) => sum + p.revenue, 0);
+const avgPrice = categoryData.reduce((sum, p) => sum + p.price, 0) / categoryData.length;
+---
+
+<Layout>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="mb-6 bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
+      <p class="text-orange-800 font-semibold">
+        ⚡ Rendu Dynamique (SSR) - Page générée à chaque requête avec prerender = false
+      </p>
+    </div>
+
+    <a 
+      href="/pizza-dynamique" 
+      class="inline-flex items-center text-orange-600 hover:text-orange-800 mb-6 font-semibold"
+    >
+      ← Retour à la liste
+    </a>
+
+    <!-- En-tête -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold mb-2 text-gray-900">{types}</h1>
+      <p class="text-xl text-gray-600">
+        Analyse de {categoryData.length} commandes
+      </p>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="bg-orange-50 rounded-lg p-4 border-2 border-orange-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Total commandes</h3>
+        <p class="text-3xl font-bold text-orange-600">{totalOrders}</p>
+      </div>
+      <div class="bg-red-50 rounded-lg p-4 border-2 border-red-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Revenus totaux</h3>
+        <p class="text-3xl font-bold text-red-600">
+          ${Math.round(totalRevenue).toLocaleString()}
+        </p>
+      </div>
+      <div class="bg-amber-50 rounded-lg p-4 border-2 border-amber-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-1">Prix moyen</h3>
+        <p class="text-3xl font-bold text-amber-600">
+          ${Math.round(avgPrice)}
+        </p>
+      </div>
+    </div>
+
+    <!-- Graphique Principal -->
+    <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-orange-100 mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Prix vs Nombre de commandes
+      </h2>
+      <PlotFigure
+        options={{
+          marks: [
+            Plot.dot(categoryData, {
+              x: "price",
+              y: "orders",
+              fill: "category",
+              r: 5,
+              opacity: 0.7,
+            }),
+          ],
+          marginLeft: 70,
+          marginBottom: 50,
+          grid: true,
+          x: {
+            label: "Prix ($)",
+          },
+          y: {
+            label: "Nombre de commandes",
+          },
+        }}
+      />
+    </div>
+
+    <!-- Graphique Revenus dans le temps -->
+    <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-orange-100 mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Revenus par commande
+      </h2>
+      <PlotFigure
+        options={{
+          marks: [
+            Plot.barY(categoryData.slice(0, 50), {
+              x: "name",
+              y: "revenue",
+              fill: "steelblue",
+            }),
+          ],
+          marginLeft: 70,
+          marginBottom: 120,
+          grid: true,
+          x: {
+            label: null,
+            tickRotate: -45,
+          },
+          y: {
+            label: "Revenus ($)",
+          },
+        }}
+      />
+      {categoryData.length > 50 && (
+        <p class="text-sm text-gray-500 mt-2">
+          * Affichage des 50 premières commandes sur {categoryData.length} au total
+        </p>
+      )}
+    </div>
+
+    <!-- Pizzas populaires -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-6 border-2 border-gray-200">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Pizzas les plus populaires</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[...new Set(categoryData.map(p => p.name))].slice(0, 6).map((pizzaName) => {
+          const pizzaOrders = categoryData
+            .filter(p => p.name === pizzaName)
+            .reduce((sum, p) => sum + p.orders, 0);
+          return (
+            <div class="bg-white p-4 rounded-lg border border-orange-200">
+              <h3 class="font-semibold text-gray-800">{pizzaName}</h3>
+              <p class="text-gray-600 text-sm mt-1">
+                {pizzaOrders} commandes
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+    <!-- Détails techniques -->
+    <div class="mt-8 p-6 bg-gray-100 rounded-lg">
+      <h3 class="text-lg font-semibold text-gray-800 mb-3">
+        💡 Détails techniques de cette page
+      </h3>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li>
+          <strong>Route :</strong> <code class="bg-white px-2 py-1 rounded">/pizza-dynamique/{types}</code>
+        </li>
+        <li>
+          <strong>Génération :</strong> À chaque requête (SSR - Server-Side Rendering)
+        </li>
+        <li>
+          <strong>Méthode :</strong> <code class="bg-white px-2 py-1 rounded">prerender = false</code> avec <code class="bg-white px-2 py-1 rounded">Astro.params</code>
+        </li>
+        <li>
+          <strong>Données filtrées :</strong> {categoryData.length} commandes de la catégorie {types}
+        </li>
+        <li>
+          <strong>Type de rendu :</strong> SSR (Server-Side Rendering) - Généré dynamiquement
+        </li>
+      </ul>
+    </div>
+  </div>
+</Layout>

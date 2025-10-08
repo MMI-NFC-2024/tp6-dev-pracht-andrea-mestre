@@ -1,20 +1,17 @@
 ---
 import penguins from "../assets/penguins.json";
-
-// Générer automatiquement la liste des espèces pour le sous-menu
+import pizza from "../assets/pizza.json";
 const species = [...new Set(penguins.map((p) => p.species))].sort();
-
-// Récupérer l'URL actuelle pour mettre en surbrillance le lien actif
+const categories = [...new Set(pizza.map((p) => p.category))].sort();
 const currentPath = Astro.url.pathname;
 ---
 
 <nav class="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex items-center justify-between h-16">
-      <!-- Logo / Titre -->
+
       <a href="/" class="flex items-center space-x-2 text-white font-bold text-xl hover:text-blue-200 transition-colors">
-        <span class="text-2xl">🐧</span>
-        <span>Penguins Analysis</span>
+        <span>Graphiques Analysis</span>
       </a>
 
       <!-- Menu principal -->
@@ -52,7 +49,44 @@ const currentPath = Astro.url.pathname;
           Rendu Statique
         </a>
 
-        <!-- Menu déroulant Rendu Dynamique -->
+        <div class="relative dropdown-menu">
+          <button
+            id="dropdown-button-pizza"
+            type="button"
+            class={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center cursor-pointer ${
+              currentPath.startsWith("/pizza-dynamique")
+                ? "bg-white text-blue-600 shadow-md" 
+                : "text-white hover:bg-white/20"
+            }`}
+          >
+            Pizza Dynamique
+            <svg id="dropdown-arrow-pizza" class="w-4 h-4 ml-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div id="dropdown-content-pizza" class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl">
+            <a
+              href="/pizza-dynamique"
+              class="block px-4 py-3 text-gray-700 hover:bg-orange-50 rounded-t-lg font-semibold border-b border-gray-100"
+            >
+              📋 Liste des catégories
+            </a>
+            <div class="py-2">
+              {categories.map((c) => (
+                <a
+                  href={`/pizza-dynamique/${c}`}
+                  class={`block px-4 py-2 text-gray-700 hover:bg-orange-50 transition-colors ${
+                    currentPath === `/pizza-dynamique/${c}` ? "bg-orange-100 font-semibold" : ""
+                  }`}
+                >
+                  🍕 {c}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div class="relative dropdown-menu">
           <button
             id="dropdown-button"
@@ -69,7 +103,6 @@ const currentPath = Astro.url.pathname;
             </svg>
           </button>
 
-          <!-- Sous-menu -->
           <div id="dropdown-content" class="hidden absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-xl">
             <a
               href="/rendu-dynamique"
@@ -93,7 +126,7 @@ const currentPath = Astro.url.pathname;
         </div>
       </div>
 
-      <!-- Menu mobile (hamburger) -->
+
       <button
         id="mobile-menu-button"
         class="md:hidden text-white p-2 rounded-lg hover:bg-white/20 transition-colors"
@@ -106,7 +139,7 @@ const currentPath = Astro.url.pathname;
     </div>
   </div>
 
-  <!-- Menu mobile dépliant -->
+
   <div id="mobile-menu" class="hidden md:hidden bg-blue-700">
     <div class="px-4 py-3 space-y-2">
       <a href="/" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
@@ -118,6 +151,19 @@ const currentPath = Astro.url.pathname;
       <a href="/rendu-statique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg">
         Rendu Statique
       </a>
+      
+      <div class="border-t border-blue-500 pt-2 mt-2">
+        <p class="px-4 py-2 text-white font-semibold text-sm">Pizza Dynamique</p>
+        <a href="/pizza-dynamique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg text-sm">
+          📋 Liste des catégories
+        </a>
+        {categories.map((c) => (
+          <a href={`/pizza-dynamique/${c}`} class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg text-sm">
+            🍕 {c}
+          </a>
+        ))}
+      </div>
+
       <div class="border-t border-blue-500 pt-2 mt-2">
         <p class="px-4 py-2 text-white font-semibold text-sm">Rendu Dynamique</p>
         <a href="/rendu-dynamique" class="block px-4 py-2 text-white hover:bg-white/20 rounded-lg text-sm">
@@ -148,18 +194,42 @@ const currentPath = Astro.url.pathname;
     const dropdownContent = document.getElementById('dropdown-content');
     const dropdownArrow = document.getElementById('dropdown-arrow');
     
-    // Toggle au click
+    const dropdownButtonPizza = document.getElementById('dropdown-button-pizza');
+    const dropdownContentPizza = document.getElementById('dropdown-content-pizza');
+    const dropdownArrowPizza = document.getElementById('dropdown-arrow-pizza');
+    
+    // Toggle au click pour Penguins
     dropdownButton?.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdownContent?.classList.toggle('hidden');
       dropdownArrow?.classList.toggle('rotate-180');
+      // Fermer le menu pizza si ouvert
+      dropdownContentPizza?.classList.add('hidden');
+      dropdownArrowPizza?.classList.remove('rotate-180');
     });
 
-    // Fermer le menu si on clique ailleurs
+    // Toggle au click pour Pizza
+    dropdownButtonPizza?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownContentPizza?.classList.toggle('hidden');
+      dropdownArrowPizza?.classList.toggle('rotate-180');
+      // Fermer le menu penguins si ouvert
+      dropdownContent?.classList.add('hidden');
+      dropdownArrow?.classList.remove('rotate-180');
+    });
+
+    // Fermer les menus si on clique ailleurs
     document.addEventListener('click', (e) => {
-      if (!dropdownButton?.contains(e.target as Node) && !dropdownContent?.contains(e.target as Node)) {
+      const target = e.target as Node;
+      
+      if (!dropdownButton?.contains(target) && !dropdownContent?.contains(target)) {
         dropdownContent?.classList.add('hidden');
         dropdownArrow?.classList.remove('rotate-180');
+      }
+      
+      if (!dropdownButtonPizza?.contains(target) && !dropdownContentPizza?.contains(target)) {
+        dropdownContentPizza?.classList.add('hidden');
+        dropdownArrowPizza?.classList.remove('rotate-180');
       }
     });
   });
